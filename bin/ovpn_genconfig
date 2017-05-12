@@ -152,6 +152,7 @@ if [ -z "${EASYRSA_PKI:-}" ]; then
     export EASYRSA_PKI="$OPENVPN/pki"
 fi
 
+EASYRSA_KEY_SIZE=4096
 OVPN_ENV=${OPENVPN}/ovpn_env.sh
 OVPN_SERVER=192.168.255.0/24
 OVPN_DEFROUTE=1
@@ -163,8 +164,8 @@ OVPN_KEEPALIVE="10 60"
 OVPN_DNS_SERVERS=("8.8.8.8" "8.8.4.4")
 TMP_DNS_SERVERS=()
 OVPN_TLS_CIPHER=''
-OVPN_CIPHER=''
-OVPN_AUTH=''
+OVPN_CIPHER='AES-256-CBC'
+OVPN_AUTH='SHA384'
 OVPN_EXTRA_CONFIG=''
 CUSTOM_ROUTE_CONFIG=''
 OVPN_COMP_LZO=0
@@ -275,8 +276,8 @@ else
 fi
 
 # Apply defaults
-[ -z "$OVPN_PROTO" ] && OVPN_PROTO=udp
-[ -z "$OVPN_PORT" ] && OVPN_PORT=1194
+[ -z "$OVPN_PROTO" ] && OVPN_PROTO=tcp
+[ -z "$OVPN_PORT" ] && OVPN_PORT=443
 [ -z "$CUSTOM_ROUTE_CONFIG" ] && [ "$OVPN_DEFROUTE" == "1" ] && process_route_config "192.168.254.0/24"
 
 # Save extra client config from temp file only if temp file is not empty
@@ -334,8 +335,8 @@ persist-key
 persist-tun
 
 proto $OVPN_PROTO
-# Rely on Docker to do port mapping, internally always 1194
-port 1194
+# Rely on Docker to do port mapping, internally always 443
+port 443
 dev $OVPN_DEVICE$OVPN_DEVICEN
 status /tmp/openvpn-status.log
 
